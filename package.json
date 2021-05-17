@@ -1,7 +1,8 @@
 {
-  "name": "rn-swiper",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "react-native-reswiper",
+  "version": "1.0.0-beta2",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "liuyunjs",
   "license": "MIT",
   "private": false,
@@ -30,11 +31,11 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@liuyunjs/hooks": "^1.0.0-beta1",
+    "@liuyunjs/hooks": "^1.0.0-beta2",
     "@liuyunjs/timer": "^1.0.0-beta3",
     "@liuyunjs/utils": "1.0.0-beta5",
     "react-native-gesture-handler": "^1.10.3",
-    "react-native-reanimated": "1.13.3",
+    "react-native-reanimated": "^1.13.3",
     "react-use-callback": "^0.0.3"
   }
 }
