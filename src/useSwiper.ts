@@ -6,7 +6,7 @@ import {
   SwiperContext as SwiperBaseContext,
 } from '@liuyunjs/hooks/lib/react-native-reanimated/useSwiper';
 import { modulo as moduloNum } from '@liuyunjs/utils/lib/modulo';
-import useReactCallback from 'react-use-callback';
+import { useReactCallback } from '@liuyunjs/hooks/lib/useReactCallback';
 
 export type UseSwiperProps = Omit<UseSwiperBaseProps, 'minimum' | 'maximum'> & {
   loop?: boolean;

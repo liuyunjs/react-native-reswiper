@@ -1157,16 +1157,13 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@liuyunjs/hooks@^1.0.0-beta2":
-  version "1.0.0-beta2"
-  resolved "https://registry.yarnpkg.com/@liuyunjs/hooks/-/hooks-1.0.0-beta2.tgz#6fa90c49c89bb283aeb475c7c3c535bc5ce4bb06"
-  integrity sha512-pXiH+/Qd3iu/5oXQf/XRZipb8nqo6AI0EUKmavfo3Gv+rvZRYyYs7V8IYKkCNB5+htzmz6mbR1Wodhko21bvAg==
+"@liuyunjs/hooks@^1.0.0-beta3":
+  version "1.0.0-beta3"
+  resolved "https://registry.yarnpkg.com/@liuyunjs/hooks/-/hooks-1.0.0-beta3.tgz#bab136d36b38b840fbd61f460eb17567aeabd708"
+  integrity sha512-eONLBAu2LkrC54D0l17oRiEZtfWjLCifKsO33H/lKbqsEg7YIKkh8cDHZCawcaXnAa92dAl1m0+cfdLezKJmkA==
   dependencies:
     "@liuyunjs/timer" "^1.0.0-beta3"
     "@liuyunjs/utils" "1.0.0-beta5"
-    react ">=16.8.0"
-    react-native-gesture-handler "^1.10.3"
-    react-native-reanimated "^1.13.3"
     react-use-callback "^0.0.3"
     react-will-mount-hook "^1.0.1"
     tslib "^2.2.0"
@@ -4047,7 +4044,7 @@ react-native-gesture-handler@^1.10.3:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-react-native-reanimated@1.13.3, react-native-reanimated@^1.13.3:
+react-native-reanimated@^1.13.3:
   version "1.13.3"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.13.3.tgz#fb0e1d582c8866015140f2159e147ffe6e798a3a"
   integrity sha512-i714H24dv6ncpFO7/SZ0PfAMbvjgVbF8Ow2NPtowoZAz8osS54DmTMrkgJ9Za+uEku/s0AEaxqiXG2Xgntvv2g==
@@ -4081,14 +4078,6 @@ react-will-mount-hook@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/react-will-mount-hook/-/react-will-mount-hook-1.0.1.tgz#d9a90d95005b76cb17f23d8ad8136ccb95d8cc7c"
   integrity sha512-mLDHmX6JtGsgnAT3rDb8YFjBFx2e/9MvhYVPMAyvq3QVBuuLWSbFKHgybqzQ/O7mi8kCP4mv4YeBzge50LY4wQ==
-
-react@>=16.8.0:
-  version "17.0.2"
-  resolved "https://registry.yarnpkg.com/react/-/react-17.0.2.tgz#d0b5cc516d29eb3eee383f75b62864cfb6800037"
-  integrity sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==
-  dependencies:
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
 
 read-pkg-up@^7.0.1:
   version "7.0.1"
