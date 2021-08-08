@@ -1,14 +1,26 @@
 {
   "name": "react-native-reswiper",
-  "version": "1.0.0-beta3",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "version": "1.0.2",
+  "main": "dist/main.js",
+  "types": "dist/main.d.ts",
   "author": "liuyunjs",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "rimraf lib; tsc",
-    "test": "jest"
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "build": "rimraf ./dist; tsc",
+    "prepublishOnly": "yarn build"
+  },
+  "bugs": {
+    "url": "https://github.com/liuyunjs/react-native-reswiper/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liuyunjs/react-native-reswiper"
   },
   "devDependencies": {
     "@babel/cli": "7.13.0",
@@ -16,15 +28,22 @@
     "@babel/preset-env": "7.13.8",
     "@babel/preset-react": "7.12.13",
     "@babel/preset-typescript": "7.13.0",
+    "@babel/runtime": "^7.12.5",
+    "@react-native-community/eslint-config": "^2.0.0",
     "@testing-library/react-hooks": "^5.1.2",
     "@types/jest": "^26.0.23",
     "@types/react": "^17.0.5",
     "@types/react-native": "^0.64.5",
+    "@types/react-test-renderer": "^16.9.2",
     "babel-jest": "26.6.3",
+    "eslint": "^7.14.0",
     "jest": "^26.6.3",
+    "metro-react-native-babel-preset": "^0.64.0",
     "prettier": "^2.1.2",
     "raf": "3.4.1",
+    "react": "17.0.1",
     "react-dom": "^17.0.2",
+    "react-native": "0.64.1",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-reanimated": "^1.13.3",
     "react-test-renderer": "^17.0.2",
@@ -37,8 +56,23 @@
     "react-native-reanimated": "^1.13.3"
   },
   "dependencies": {
-    "@liuyunjs/hooks": "^1.0.0-beta3",
-    "@liuyunjs/timer": "^1.0.0-beta3",
-    "@liuyunjs/utils": "1.0.0-beta5"
+    "@liuyunjs/hooks": "^1.1.5",
+    "@liuyunjs/utils": "^1.0.0",
+    "react-use": "*",
+    "rn-darkly": "*"
+  },
+  "resolutions": {
+    "@types/react": "^17"
+  },
+  "jest": {
+    "preset": "react-native",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   }
 }
