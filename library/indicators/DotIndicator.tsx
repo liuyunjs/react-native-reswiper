@@ -5,63 +5,18 @@ import { modulo } from '@liuyunjs/utils/lib/modulo';
 import { darkly } from 'rn-darkly';
 import { SwiperContext } from '../withSwiper';
 
-const { interpolate } = Animated;
+const { interpolateColors } = Animated;
 
-const DotIndicatorItemAnim: React.FC<{
-  color: string;
-  active: 0 | 1;
-  inputRange: number[];
-  index: number;
-  sideCount: number;
-  size: number;
-  current: Animated.Node<number>;
-  itemCount: number;
-}> = ({
-  color,
-  itemCount,
-  sideCount,
-  size,
-  current,
-  active,
-  inputRange,
-  index,
-}) => {
-  const opacity = React.useMemo(() => {
-    return interpolate(current, {
-      inputRange,
-      outputRange: inputRange.map((i) => {
-        if (modulo(i - sideCount, itemCount) === index) return active;
-        return +!active;
-      }),
-    });
-  }, [inputRange, sideCount, itemCount, active, current]);
-
-  return (
-    <Animated.View
-      style={[
-        StyleSheet.absoluteFill,
-        {
-          backgroundColor: color,
-          opacity,
-          borderRadius: size / 2,
-        },
-      ]}
-    />
-  );
-};
-
-const DotIndicatorItem: React.FC<{
+const DotIndicatorItem = React.memo<{
   index: number;
   sideCount: number;
   current: Animated.Node<number>;
   color?: string;
   activeColor?: string;
   size?: number;
-  inputRange: number[];
   total: number;
   itemCount: number;
-}> = ({
-  inputRange,
+}>(function DotIndicatorItem({
   itemCount,
   sideCount,
   color,
@@ -69,37 +24,39 @@ const DotIndicatorItem: React.FC<{
   current,
   index,
   size,
-}) => {
+  total,
+}) {
+  const outputColorRange: string[] = [];
+
+  const inputRange = new Array(total).fill(0).map((v, i) => {
+    if (modulo(i - sideCount, itemCount) === index) {
+      outputColorRange.push(activeColor!);
+    } else {
+      outputColorRange.push(color!);
+    }
+
+    return i;
+  });
+
+  const bgColor: Animated.Node<any> = interpolateColors(current, {
+    inputRange,
+    outputColorRange,
+  });
+
+  const borderRadius = size! / 2;
+
   return (
-    <View
+    <Animated.View
       style={{
         width: size,
         height: size,
-        margin: size! / 2,
-      }}>
-      <DotIndicatorItemAnim
-        itemCount={itemCount}
-        sideCount={sideCount}
-        current={current}
-        size={size!}
-        index={index}
-        inputRange={inputRange}
-        color={color!}
-        active={0}
-      />
-      <DotIndicatorItemAnim
-        itemCount={itemCount}
-        sideCount={sideCount}
-        current={current}
-        size={size!}
-        index={index}
-        inputRange={inputRange}
-        color={activeColor!}
-        active={1}
-      />
-    </View>
+        margin: borderRadius,
+        borderRadius,
+        backgroundColor: bgColor,
+      }}
+    />
   );
-};
+});
 
 const DotIndicator: React.FC<{
   color?: string;
@@ -112,11 +69,6 @@ const DotIndicator: React.FC<{
 
   position = position || (horizontal ? 'bottom' : 'right');
   horizontal = position === 'top' || position === 'bottom';
-
-  const inputRange = React.useMemo(
-    () => new Array(total).fill(0).map((v, i) => i),
-    [total],
-  );
 
   const items: React.ReactNode[] = [];
 
@@ -132,7 +84,6 @@ const DotIndicator: React.FC<{
         index={i}
         size={size}
         current={current}
-        inputRange={inputRange}
       />,
     );
   }
