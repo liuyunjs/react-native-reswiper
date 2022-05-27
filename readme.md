@@ -141,6 +141,10 @@ _【必传】_ 一个函数，根据 index 返回每个轮播图
 定义轮播的动画，默认为 interpolators.slide
 可以通过传入此 prop 自定义动画
 
+#### panProps?: PanGestureHandlerProps
+
+传递给 PanGestureHandler 的 props， enabled onGestureEvent onHandlerStateChange 除外
+
 ##### 再加上 itemStyleInterpolator 自定义动画接收的配置
 
 ### Indicator

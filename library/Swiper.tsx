@@ -11,6 +11,7 @@ import Animated, {
   // @ts-ignore
   EasingNode,
 } from 'react-native-reanimated';
+import { PanGestureHandlerProps } from 'react-native-gesture-handler';
 import { useInitializer } from './useInitializer';
 import { useGestureEvent } from './useGestureEvent';
 import { useAnimate } from './useAnimate';
@@ -55,6 +56,10 @@ export type SwiperProps<T extends Interpolator> = (
   style?: StyleProp<ViewStyle>;
   slideSize?: number;
   trackOffset?: number;
+  panProps?: Omit<
+    PanGestureHandlerProps,
+    'enabled' | 'onGestureEvent' | 'onHandlerStateChange'
+  >;
 };
 
 export type Context = ReturnType<typeof useInitializer>;
