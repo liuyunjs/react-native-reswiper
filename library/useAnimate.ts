@@ -1,47 +1,58 @@
-import Animated from 'react-native-reanimated';
-import { useInitializer } from './useInitializer';
+import * as React from 'react';
+import Animated, {
+  block,
+  not,
+  clockRunning,
+  stopClock,
+  startClock,
+  timing,
+  set,
+  cond,
+  Value,
+} from 'react-native-reanimated';
+import type { Context, SwiperProps } from './Swiper';
+import type { Interpolator } from './Interpolator';
 
-type AnimateProps = {
-  loop: boolean;
-  total: number;
-  start: () => Animated.Node<number>;
-  ctx: ReturnType<typeof useInitializer>;
-};
+export const useAnimate = <T extends Interpolator = Interpolator>(
+  { easing, duration, autoplay }: SwiperProps<T>,
+  ctx: Context,
+) => {
+  const stop = () => stopClock(ctx.clock);
 
-const { max, min, add, block, set } = Animated;
+  const start = React.useCallback(
+    (to: Animated.Node<number>) => {
+      const state = {
+        position: ctx.progress,
+        time: new Value(0),
+        finished: new Value(0),
+        frameTime: new Value(0),
+      };
 
-export const useAnimate = ({
-  loop,
-  total,
-  start,
-  ctx: { values },
-}: AnimateProps) => {
-  const animateTo = (
-    toIndex: Animated.Adaptable<number>,
-    animated?: boolean,
-  ) => {
-    if (animated !== false) {
-      return block([set(values.nextIndex, toIndex), start(), toIndex]);
-    }
-    return block([
-      set(values.index, toIndex),
-      set(values.nextIndex, toIndex),
-      set(values.position, toIndex),
-    ]);
-  };
+      return block([
+        cond(not(clockRunning(ctx.clock)), [
+          set(state.frameTime, 0),
+          set(state.time, 0),
+          set(state.finished, 0),
+          set(ctx.index, to),
+        ]),
+        timing(ctx.clock, state, {
+          duration: duration!,
+          easing: easing!,
+          toValue: ctx.index,
+        }),
 
-  const clamp = (num: Animated.Adaptable<number>) => {
-    if (loop) return num;
-    return min(total - 1, max(0, num));
-  };
+        cond(not(clockRunning(ctx.clock)), startClock(ctx.clock)),
 
-  const animateBy = (num: Animated.Adaptable<number>, animated?: boolean) => {
-    const next = clamp(add(values.nextIndex, num));
-    return animateTo(next, animated);
-  };
+        cond(state.finished, [
+          set(ctx.gesture, 0),
+          set(ctx.velocity, 0),
+          set(ctx.autoplay.isAutoPlay, +autoplay!),
+          stop(),
+        ]),
+      ]);
+    },
+    [duration, easing, autoplay],
+  );
 
-  return {
-    animateBy,
-    animateTo,
-  };
+  return { start, stop };
 };

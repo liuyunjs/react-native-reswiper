@@ -14,6 +14,7 @@
 		283656581D2C78798C6B8D1A /* libPods-swiper-swiperTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 97DB7C0A6C6FF0C462C89A56 /* libPods-swiper-swiperTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		B918665ADA5771AD87901C14 /* libPods-swiper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 64D13D1B14B2F681BC8B4E26 /* libPods-swiper.a */; };
+		DF60C543283BA709009D7A95 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF60C542283BA709009D7A95 /* App.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +43,8 @@
 		97DB7C0A6C6FF0C462C89A56 /* libPods-swiper-swiperTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-swiper-swiperTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B08E5983C1276F111F4F8EFA /* Pods-swiper-swiperTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-swiper-swiperTests.debug.xcconfig"; path = "Target Support Files/Pods-swiper-swiperTests/Pods-swiper-swiperTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BF0B5F2D21EB0BF1783827FE /* Pods-swiper-swiperTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-swiper-swiperTests.release.xcconfig"; path = "Target Support Files/Pods-swiper-swiperTests/Pods-swiper-swiperTests.release.xcconfig"; sourceTree = "<group>"; };
+		DF60C541283BA709009D7A95 /* swiper-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "swiper-Bridging-Header.h"; sourceTree = "<group>"; };
+		DF60C542283BA709009D7A95 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EEA589318D6C9A2FB4C506B7 /* Pods-swiper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-swiper.release.xcconfig"; path = "Target Support Files/Pods-swiper/Pods-swiper.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -92,6 +95,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				DF60C542283BA709009D7A95 /* App.swift */,
+				DF60C541283BA709009D7A95 /* swiper-Bridging-Header.h */,
 			);
 			name = swiper;
 			sourceTree = "<group>";
@@ -114,7 +119,6 @@
 				B08E5983C1276F111F4F8EFA /* Pods-swiper-swiperTests.debug.xcconfig */,
 				BF0B5F2D21EB0BF1783827FE /* Pods-swiper-swiperTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -208,7 +212,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 1320;
 					};
 				};
 			};
@@ -411,6 +415,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF60C543283BA709009D7A95 /* App.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
@@ -431,6 +436,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B08E5983C1276F111F4F8EFA /* Pods-swiper-swiperTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -458,6 +464,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF0B5F2D21EB0BF1783827FE /* Pods-swiper-swiperTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = swiperTests/Info.plist;
@@ -498,6 +505,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = swiper;
+				SWIFT_OBJC_BRIDGING_HEADER = "swiper-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -523,6 +531,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = swiper;
+				SWIFT_OBJC_BRIDGING_HEADER = "swiper-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

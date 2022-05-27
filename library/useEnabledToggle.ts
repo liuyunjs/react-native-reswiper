@@ -1,19 +1,17 @@
 import { useReactionState } from '@liuyunjs/hooks/lib/useReactionState';
-import useUpdateEffect from 'react-use/esm/useUpdateEffect';
+import * as React from 'react';
 
-export const useEnabledToggle = (gestureEnabled?: boolean) => {
-  gestureEnabled = gestureEnabled !== false;
-  const [gestureEnabledState, setGestureEnabledState] =
-    useReactionState(gestureEnabled);
+export const useEnabledToggle = ({ enabled }: { enabled?: boolean }) => {
+  const [gestureEnabled, setGestureEnabled] = useReactionState(enabled);
 
-  useUpdateEffect(() => {
-    if (!gestureEnabled) {
+  React.useEffect(() => {
+    if (!enabled) {
       return;
     }
-    if (!gestureEnabledState) {
-      setGestureEnabledState(true);
+    if (!gestureEnabled) {
+      setGestureEnabled(true);
     }
-  }, [gestureEnabledState]);
+  }, [gestureEnabled]);
 
-  return [gestureEnabledState, setGestureEnabledState] as const;
+  return [gestureEnabled, setGestureEnabled] as const;
 };
