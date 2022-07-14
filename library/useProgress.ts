@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { I18nManager } from 'react-native';
 import Animated, {
   block,
   set,
@@ -34,23 +35,28 @@ export const useProgress = <T extends Interpolator = Interpolator>(
     itemCount,
     autoplayInterval,
     onChange: onIndexChange,
+    horizontal,
   }: SwiperProps<T>,
   ctx: Context,
   animate: Animate,
   size: number,
-  directionLeftOrRight: Animated.Adaptable<number>,
   toggleEnabled: (enabled: boolean | ((enabled?: boolean) => boolean)) => void,
+  setIndex: (index: number) => void,
 ) => {
   const onIndexChangeCallback = useReactCallback(
     ([index]: readonly number[]) => {
       ctx.indexJs = index;
-      onIndexChange?.(moduloJs(-index, itemCount));
+      const realIndex = moduloJs(-index, itemCount);
+      setIndex(realIndex);
+      onIndexChange?.(realIndex);
     },
   );
 
   return React.useMemo(() => {
     const minValue = 1 - itemCount;
     const maxValue = 0;
+
+    const directionLeftOrRight = horizontal && I18nManager.isRTL ? -1 : 1;
 
     const clampProgress = (n: Animated.Adaptable<number>) => {
       return loop ? n : clamp(n, minValue, maxValue);
@@ -152,21 +158,12 @@ export const useProgress = <T extends Interpolator = Interpolator>(
         : set(ctx.autoplay.isAutoPlay, 0),
 
       loop ? ctx.progress : set(ctx.progress, clampProgress(ctx.progress)),
-      // : cond(
-      //     lessThan(ctx.progress, minValue),
-      //     [set(ctx.progress, minValue), set(ctx.index, minValue)],
-      //     cond(greaterThan(ctx.progress, maxValue), [
-      //       set(ctx.progress, maxValue),
-      //       set(ctx.index, maxValue),
-      //     ]),
-      //   ),
-      // ctx.progress,
     ]);
   }, [
     autoplay,
     loop,
     itemCount,
-    directionLeftOrRight,
+    horizontal,
     size,
     autoplayInterval,
     animate.start,

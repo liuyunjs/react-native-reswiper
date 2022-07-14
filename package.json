@@ -1,6 +1,6 @@
 {
   "name": "react-native-reswiper",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "liuyunjs",
@@ -13,7 +13,7 @@
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "rimraf ./dist; rollup -c rollup.config.js",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "rollup -c rollup.config.js"
   },
   "bugs": {
     "url": "https://github.com/liuyunjs/react-native-reswiper/issues"

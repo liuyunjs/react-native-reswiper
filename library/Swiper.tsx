@@ -1,17 +1,12 @@
 import * as React from 'react';
-import {
-  I18nManager,
-  StyleProp,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, {
   Easing,
   // @ts-ignore
   EasingNode,
 } from 'react-native-reanimated';
 import { PanGestureHandlerProps } from 'react-native-gesture-handler';
+import { useReactionState } from '@liuyunjs/hooks/lib/useReactionState';
 import { useInitializer } from './useInitializer';
 import { useGestureEvent } from './useGestureEvent';
 import { useAnimate } from './useAnimate';
@@ -26,6 +21,7 @@ import {
   interpolators,
   InterpolatorConfig,
 } from './Interpolator';
+import { clamp } from '@liuyunjs/utils/lib/clamp';
 
 interface HorizontalProps {
   horizontal?: true;
@@ -60,6 +56,7 @@ export type SwiperProps<T extends Interpolator> = (
     PanGestureHandlerProps,
     'enabled' | 'onGestureEvent' | 'onHandlerStateChange'
   >;
+  maxRenderCount?: number;
 };
 
 export type Context = ReturnType<typeof useInitializer>;
@@ -71,9 +68,12 @@ const E = EasingNode || Easing;
 export const Swiper = <T extends Interpolator>(
   props: SwiperProps<T> & InterpolatorConfig<T>,
 ) => {
-  const { children, enabled, index, ...rest } = props;
+  const { children, enabled, ...rest } = props;
   const { horizontal, itemCount } = rest;
-  const directionLeftOrRight = horizontal && I18nManager.isRTL ? -1 : 1;
+  const [index, setIndex] = useReactionState<number>(
+    clamp(0, rest.index!, itemCount - 1),
+  );
+
   const size = horizontal
     ? (props as HorizontalProps).width
     : (props as VerticalProps).height;
@@ -93,20 +93,17 @@ export const Swiper = <T extends Interpolator>(
     ctx,
     animate,
     size,
-    directionLeftOrRight,
     toggleEnabled,
+    setIndex,
   );
 
-  const getRelativeProgress = useRelativeProgress(
-    props,
-    progress,
-    directionLeftOrRight,
-  );
+  const getRelativeProgress = useRelativeProgress(props, progress);
 
   return (
     <View style={[styles.container, props.style]}>
       <SwiperInternal
         {...(rest as any)}
+        index={index}
         enabled={gestureEnabled && enabled && !!size}
         getRelativeProgress={getRelativeProgress}
         size={size}
@@ -138,6 +135,7 @@ Swiper.defaultProps = {
   itemStyleInterpolator: interpolators.slide,
   slideSize: 1,
   trackOffset: 0,
+  maxRenderCount: 5,
 };
 
 const styles = StyleSheet.create({

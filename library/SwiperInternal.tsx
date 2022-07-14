@@ -5,6 +5,7 @@ import {
   PanGestureHandlerProps,
 } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
+import { modulo } from '@liuyunjs/utils/lib/modulo';
 import type { Interpolator, InterpolatorConfig } from './Interpolator';
 
 export type SwiperInternalProps<T extends Interpolator> = {
@@ -25,6 +26,8 @@ export type SwiperInternalProps<T extends Interpolator> = {
     PanGestureHandlerProps,
     'enabled' | 'onGestureEvent' | 'onHandlerStateChange'
   >;
+  index?: number;
+  maxRenderCount?: number;
 } & InterpolatorConfig<T>;
 
 const SwiperItem = <T extends Interpolator>({
@@ -67,74 +70,78 @@ const percentNum = (size: number, num: number) => {
   return Math.round(Math.abs(num) <= 1 ? size * num : num);
 };
 
-export const SwiperInternal = React.memo(
-  <T extends Interpolator>({
-    size,
-    horizontal,
-    getRelativeProgress,
-    itemBuilder,
-    itemCount,
-    onGestureEvent,
-    enabled,
-    itemStyleInterpolator,
-    loop,
-    trackOffset,
-    slideSize,
-    panProps,
-    ...interpolatorConfig
-  }: SwiperInternalProps<T>) => {
-    const nodes: React.ReactNode[] = [];
-    trackOffset = percentNum(size, trackOffset);
-    slideSize = percentNum(size, slideSize);
+export const SwiperInternal = <T extends Interpolator>({
+  size,
+  horizontal,
+  getRelativeProgress,
+  itemBuilder,
+  itemCount,
+  onGestureEvent,
+  enabled,
+  itemStyleInterpolator,
+  loop,
+  trackOffset,
+  slideSize,
+  panProps,
 
-    for (let i = 0; i < itemCount; i++) {
-      const progress = getRelativeProgress(i);
-      nodes.push(
-        <SwiperItem
-          {...(interpolatorConfig as any)}
-          progress={progress}
-          horizontal={horizontal}
-          size={slideSize}
-          itemCount={itemCount}
-          loop={loop}
-          styleInterpolator={itemStyleInterpolator}
-          key={i}>
-          {itemBuilder(i)}
-        </SwiperItem>,
-      );
-    }
+  index,
+  maxRenderCount,
+  ...interpolatorConfig
+}: SwiperInternalProps<T>) => {
+  const nodes: React.ReactNode[] = [];
+  trackOffset = percentNum(size, trackOffset);
+  slideSize = percentNum(size, slideSize);
 
-    return (
-      <PanGestureHandler
-        {...panProps}
-        enabled={enabled}
-        onHandlerStateChange={onGestureEvent}
-        onGestureEvent={onGestureEvent}>
-        <Animated.View style={styles.container}>
+  const max = Math.min(itemCount, maxRenderCount!);
+
+  for (let i = 0, len = max; i < len; i++) {
+    const swipeIndex = modulo(index! + i - Math.floor(max / 2), itemCount);
+    const progress = getRelativeProgress(swipeIndex);
+    nodes.push(
+      <SwiperItem
+        {...(interpolatorConfig as any)}
+        progress={progress}
+        horizontal={horizontal}
+        size={slideSize}
+        itemCount={itemCount}
+        loop={loop}
+        styleInterpolator={itemStyleInterpolator}
+        key={swipeIndex}>
+        {itemBuilder(swipeIndex)}
+      </SwiperItem>,
+    );
+  }
+
+  return (
+    <PanGestureHandler
+      {...panProps}
+      enabled={enabled}
+      onHandlerStateChange={onGestureEvent}
+      onGestureEvent={onGestureEvent}>
+      <Animated.View style={styles.container}>
+        <View
+          style={[
+            styles.container,
+            {
+              transform: [
+                horizontal
+                  ? { translateX: trackOffset }
+                  : { translateY: trackOffset },
+              ],
+            },
+          ]}>
           <View
             style={[
               styles.container,
-              {
-                transform: [
-                  horizontal
-                    ? { translateX: trackOffset }
-                    : { translateY: trackOffset },
-                ],
-              },
+              horizontal ? { width: slideSize } : { height: slideSize },
             ]}>
-            <View
-              style={[
-                styles.container,
-                horizontal ? { width: slideSize } : { height: slideSize },
-              ]}>
-              {nodes}
-            </View>
+            {nodes}
           </View>
-        </Animated.View>
-      </PanGestureHandler>
-    );
-  },
-);
+        </View>
+      </Animated.View>
+    </PanGestureHandler>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

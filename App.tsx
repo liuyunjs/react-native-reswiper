@@ -9,7 +9,14 @@
  */
 
 import React from 'react';
-import { View, Text, Dimensions, SafeAreaView, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Dimensions,
+  SafeAreaView,
+  StyleSheet,
+  Button,
+} from 'react-native';
 import { Swiper, Indicator } from './library/main';
 
 const itemBuilder = (index: number) => {
@@ -30,12 +37,14 @@ const App = () => {
   const [index, setIndex] = React.useState(0);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
+        <Button title="change" onPress={() => setIndex(index + 1)} />
         <Swiper
           width={Dimensions.get('window').width}
           height={Dimensions.get('window').height}
           index={index}
+          autoplay={false}
           onChange={setIndex}
           itemBuilder={itemBuilder}
           itemCount={8}>
@@ -46,7 +55,7 @@ const App = () => {
           </SafeAreaView>
         </Swiper>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
