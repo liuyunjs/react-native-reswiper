@@ -1,6 +1,6 @@
 # react-native-reswiper
 
-基于 react-native-reanimated v1 react-native-gesture-handler 实现的一套轮播图组件，可自定义动画
+基于 react-native-reanimated v1声明式api(兼容v2) react-native-gesture-handler 实现的一套轮播图组件，可自定义动画
 
 ## 安装
 
@@ -18,16 +18,17 @@ npm install react-native-reswiper react-native-reanimated react-native-gesture-h
 
 ## 示例
 
-```typescript
+```typescript jsx
 import React from 'react';
-import { View, Text, Dimensions, SafeAreaView, StyleSheet } from 'react-native';
 import {
-  Swiper,
-  ReactiveIndicator,
-  Interpolator,
-  interpolators,
-  indicatorInterpolators,
-} from 'react-native-reswiper';
+  View,
+  Text,
+  Dimensions,
+  SafeAreaView,
+  StyleSheet,
+  Button,
+} from 'react-native';
+import { Swiper, IndexIndicator } from 'react-native-reswiper';
 
 const itemBuilder = (index: number) => {
   return (
@@ -47,23 +48,27 @@ const App = () => {
   const [index, setIndex] = React.useState(0);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
+        <Button title="change" onPress={() => setIndex(index + 1)} />
         <Swiper
+          lazy
+          // horizontal={false}
           width={Dimensions.get('window').width}
           height={Dimensions.get('window').height}
           index={index}
+          autoplay={false}
           onChange={setIndex}
           itemBuilder={itemBuilder}
-          itemCount={8}>
+          itemCount={800}>
           <SafeAreaView style={StyleSheet.absoluteFill} pointerEvents="none">
             <View style={{ flex: 1 }}>
-              <ReactiveIndicator activeColor="orange" gap={2} size={12} />
+              <IndexIndicator inset={-40} position="top" />
             </View>
           </SafeAreaView>
         </Swiper>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 ```
@@ -132,7 +137,17 @@ _【必传】_ 一个函数，根据 index 返回每个轮播图
 
 内侧轮播的偏移量，当 trackOffset 小于等于 1 的时候视为百分比，会乘上对应的宽度或者高度，大于 1 的时候直接使用设定的值
 
+#### maxRenderCount?: number (v1.2.0)
+最多渲染几页，默认为5
+
+#### lazy?: boolean (v1.3.0)
+是否启用懒加载，默认不启用
+
+#### lazyPlaceholder?: React.ReactNode (v1.3.0)
+启用懒加载时的占位View
+
 #### style?: StyleProp<ViewStyle>;
+
 
 最外层 View 的样式
 
@@ -147,7 +162,8 @@ _【必传】_ 一个函数，根据 index 返回每个轮播图
 
 ##### 再加上 itemStyleInterpolator 自定义动画接收的配置
 
-### ReactiveIndicator
+### ReactiveIndicator 
+实时响应的一个指示器，在轮播图很多时不建议使用，会很卡
 
 #### position?: 'top' | 'bottom' | 'start' | 'end';
 
@@ -162,4 +178,39 @@ _【必传】_ 一个函数，根据 index 返回每个轮播图
 定义指示器的动画，默认为 indicatorInterpolators.dot
 可以通过传入此 prop 自定义动画
 
+#### inset?: number | { top?: number; start?: number; end?: number; bottom?: number };  (v1.3.0)
+指示器相对于容器得偏移量
+
+#### horizontalLayout?: 'center' | 'start' | 'end';  (v1.3.0)
+horizontal 为 true 时相当于设置 alignItems，为 false 时相当于设置 justifyContent
+
+#### verticalLayout?: 'middle' | 'top' | 'bottom';  (v1.3.0)
+horizontal 为 true 时相当于设置 justifyContent，为 false 时相当于设置 alignItems
+
 ##### 再加上 itemStyleInterpolator 自定义动画接收的配置
+
+
+
+### IndexIndicator (v1.3.0)
+一个文字指示器，在轮播图很多时建议使用
+
+#### position?: 'top' | 'bottom' | 'start' | 'end';
+
+指示器的位置，横向时默认是 bottom,竖向时默认是 end
+
+#### style?: StyleProp<ViewStyle>;
+
+最外层 View 的样式
+
+
+#### inset?: number | { top?: number; start?: number; end?: number; bottom?: number };
+指示器相对于容器得偏移量
+
+#### horizontalLayout?: 'center' | 'start' | 'end';
+horizontal 为 true 时相当于设置 alignItems，为 false 时相当于设置 justifyContent
+
+#### verticalLayout?: 'middle' | 'top' | 'bottom'; 
+horizontal 为 true 时相当于设置 justifyContent，为 false 时相当于设置 alignItems
+
+#### indicatorStyle?: StyleProp<TextStyle>
+指示器文字的样式
