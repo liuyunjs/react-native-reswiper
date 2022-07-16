@@ -64,8 +64,8 @@ export const IndicatorContainer: React.FC<
       containerStyle.bottom = inset.bottom || 0;
     }
     containerStyle.flexDirection = 'row';
-    containerStyle.alignItems = getLayout(horizontalLayout);
-    containerStyle.justifyContent = getLayout(verticalLayout);
+    containerStyle.alignItems = getLayout(verticalLayout);
+    containerStyle.justifyContent = getLayout(horizontalLayout);
   } else {
     containerStyle.top = inset.top || 0;
     containerStyle.bottom = inset.bottom || 0;
@@ -75,8 +75,8 @@ export const IndicatorContainer: React.FC<
       containerStyle.end = inset.end || 0;
     }
     containerStyle.flexDirection = 'column';
-    containerStyle.alignItems = getLayout(verticalLayout);
-    containerStyle.justifyContent = getLayout(horizontalLayout);
+    containerStyle.alignItems = getLayout(horizontalLayout);
+    containerStyle.justifyContent = getLayout(verticalLayout);
   }
 
   return (

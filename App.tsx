@@ -9,14 +9,7 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  Dimensions,
-  SafeAreaView,
-  StyleSheet,
-  Button,
-} from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
 import { Swiper, IndexIndicator } from './library/main';
 
 const itemBuilder = (index: number) => {
@@ -37,27 +30,22 @@ const App = () => {
   const [index, setIndex] = React.useState(0);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
-        <Button title="change" onPress={() => setIndex(index + 1)} />
-        <Swiper
-          lazy
-          // horizontal={false}
-          width={Dimensions.get('window').width}
-          height={Dimensions.get('window').height}
-          index={index}
-          autoplay={false}
-          onChange={setIndex}
-          itemBuilder={itemBuilder}
-          itemCount={800}>
-          <SafeAreaView style={StyleSheet.absoluteFill} pointerEvents="none">
-            <View style={{ flex: 1 }}>
-              <IndexIndicator inset={-40} position="top" />
-            </View>
-          </SafeAreaView>
-        </Swiper>
-      </View>
-    </SafeAreaView>
+    <Swiper
+      lazy
+      horizontal={false}
+      width={Dimensions.get('window').width}
+      height={Dimensions.get('window').height}
+      index={index}
+      // autoplay={false}
+      onChange={setIndex}
+      itemBuilder={itemBuilder}
+      itemCount={800}>
+      <IndexIndicator
+        verticalLayout="top"
+        inset={{ bottom: 44, top: 64, end: 20, start: 20 }}
+        position="start"
+      />
+    </Swiper>
   );
 };
 
