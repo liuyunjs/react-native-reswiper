@@ -105,8 +105,20 @@ export const SwiperInternal = <T extends Interpolator>({
     itemCount,
   });
 
+  const getSwipeIndex = (i: number) => {
+    if (itemCount < maxRenderCount!) return i;
+    const relativeIndex = index! + i - Math.floor(maxRenderCount! / 2);
+    if (loop) return modulo(relativeIndex, itemCount);
+    // 要渲染的第一个view已经到了最左边了
+    if (index! < maxRenderCount! / 2) return i;
+    // 要渲染的第一个view已经到了最右边了
+    if (index! > itemCount - maxRenderCount! / 2)
+      return itemCount - maxRenderCount! + i;
+    return relativeIndex;
+  };
+
   for (let i = 0, len = max; i < len; i++) {
-    const swipeIndex = modulo(index! + i - Math.floor(max / 2), itemCount);
+    const swipeIndex = getSwipeIndex(i);
     const progress = getRelativeProgress(swipeIndex);
     nodes.push(
       <SwiperItem

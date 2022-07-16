@@ -36,10 +36,12 @@ const App = () => {
       width={Dimensions.get('window').width}
       height={Dimensions.get('window').height}
       index={index}
+      loop={false}
       // autoplay={false}
       onChange={setIndex}
       itemBuilder={itemBuilder}
-      itemCount={800}>
+      maxRenderCount={4}
+      itemCount={6}>
       <IndexIndicator
         verticalLayout="top"
         inset={{ bottom: 44, top: 64, end: 20, start: 20 }}
