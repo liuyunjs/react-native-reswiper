@@ -23,7 +23,7 @@ import React from 'react';
 import { View, Text, Dimensions, SafeAreaView, StyleSheet } from 'react-native';
 import {
   Swiper,
-  Indicator,
+  ReactiveIndicator,
   Interpolator,
   interpolators,
   indicatorInterpolators,
@@ -58,7 +58,7 @@ const App = () => {
           itemCount={8}>
           <SafeAreaView style={StyleSheet.absoluteFill} pointerEvents="none">
             <View style={{ flex: 1 }}>
-              <Indicator activeColor="orange" gap={2} size={12} />
+              <ReactiveIndicator activeColor="orange" gap={2} size={12} />
             </View>
           </SafeAreaView>
         </Swiper>
@@ -147,7 +147,7 @@ _【必传】_ 一个函数，根据 index 返回每个轮播图
 
 ##### 再加上 itemStyleInterpolator 自定义动画接收的配置
 
-### Indicator
+### ReactiveIndicator
 
 #### position?: 'top' | 'bottom' | 'start' | 'end';
 

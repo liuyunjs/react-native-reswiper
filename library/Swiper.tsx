@@ -1,10 +1,17 @@
 import * as React from 'react';
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import {
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+  ActivityIndicator,
+} from 'react-native';
 import Animated, {
   Easing,
   // @ts-ignore
   EasingNode,
 } from 'react-native-reanimated';
+import { clamp } from '@liuyunjs/utils/lib/clamp';
 import { PanGestureHandlerProps } from 'react-native-gesture-handler';
 import { useReactionState } from '@liuyunjs/hooks/lib/useReactionState';
 import { useInitializer } from './useInitializer';
@@ -21,7 +28,6 @@ import {
   interpolators,
   InterpolatorConfig,
 } from './Interpolator';
-import { clamp } from '@liuyunjs/utils/lib/clamp';
 
 interface HorizontalProps {
   horizontal?: true;
@@ -57,6 +63,8 @@ export type SwiperProps<T extends Interpolator> = (
     'enabled' | 'onGestureEvent' | 'onHandlerStateChange'
   >;
   maxRenderCount?: number;
+  lazy?: boolean;
+  lazyPlaceholder?: React.ReactNode;
 };
 
 export type Context = ReturnType<typeof useInitializer>;
@@ -68,7 +76,7 @@ const E = EasingNode || Easing;
 export const Swiper = <T extends Interpolator>(
   props: SwiperProps<T> & InterpolatorConfig<T>,
 ) => {
-  const { children, enabled, ...rest } = props;
+  const { children, enabled, style, ...rest } = props;
   const { horizontal, itemCount } = rest;
   const [index, setIndex] = useReactionState<number>(
     clamp(0, rest.index!, itemCount - 1),
@@ -100,7 +108,7 @@ export const Swiper = <T extends Interpolator>(
   const getRelativeProgress = useRelativeProgress(props, progress);
 
   return (
-    <View style={[styles.container, props.style]}>
+    <View style={[styles.container, style]}>
       <SwiperInternal
         {...(rest as any)}
         index={index}
@@ -111,6 +119,7 @@ export const Swiper = <T extends Interpolator>(
       />
       {!!children && (
         <SwiperIndicator
+          index={index}
           containerSize={size}
           loop={props.loop!}
           itemCount={itemCount}
@@ -122,6 +131,17 @@ export const Swiper = <T extends Interpolator>(
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  placeholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 Swiper.defaultProps = {
   index: 0,
@@ -136,10 +156,9 @@ Swiper.defaultProps = {
   slideSize: 1,
   trackOffset: 0,
   maxRenderCount: 5,
+  lazyPlaceholder: (
+    <View style={styles.placeholder}>
+      <ActivityIndicator size="large" />
+    </View>
+  ),
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

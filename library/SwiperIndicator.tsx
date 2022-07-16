@@ -7,6 +7,7 @@ export interface ISwiperIndicatorContext {
   itemCount: number;
   loop: boolean;
   containerSize: number;
+  index: number;
 }
 
 export const SwiperIndicatorContext =
@@ -19,14 +20,18 @@ export const SwiperIndicator: React.FC<ISwiperIndicatorContext> = ({
   itemCount,
   containerSize,
   loop,
+  index,
 }) => {
-  const context: ISwiperIndicatorContext = React.useMemo(
-    () => ({ getRelativeProgress, horizontal, itemCount, containerSize, loop }),
-    [horizontal, getRelativeProgress, itemCount, containerSize, loop],
-  );
-
   return (
-    <SwiperIndicatorContext.Provider value={context}>
+    <SwiperIndicatorContext.Provider
+      value={{
+        getRelativeProgress,
+        horizontal,
+        itemCount,
+        containerSize,
+        loop,
+        index,
+      }}>
       {children}
     </SwiperIndicatorContext.Provider>
   );

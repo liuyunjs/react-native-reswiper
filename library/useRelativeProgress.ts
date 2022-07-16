@@ -9,7 +9,7 @@ export const useRelativeProgress = <T extends Interpolator = Interpolator>(
   { itemCount, loop, horizontal }: SwiperProps<T>,
   progress: Animated.Node<number>,
 ) => {
-  const result = React.useMemo<Animated.Node<number>[]>(
+  const cache = React.useMemo<Animated.Node<number>[]>(
     () => new Array(itemCount),
     [horizontal, itemCount, loop, progress],
   );
@@ -18,11 +18,11 @@ export const useRelativeProgress = <T extends Interpolator = Interpolator>(
 
   return React.useCallback(
     (index: number) => {
-      if (!result[index]) {
+      if (!cache[index]) {
         if (loop) {
           const currPos = index > viewCount ? index - itemCount : index;
 
-          result[index] = interpolate(modulo(progress, itemCount), {
+          cache[index] = interpolate(modulo(progress, itemCount), {
             inputRange: [
               0,
               viewCount + 0.5 - currPos,
@@ -38,12 +38,12 @@ export const useRelativeProgress = <T extends Interpolator = Interpolator>(
             extrapolate: Extrapolate.CLAMP,
           });
         } else {
-          result[index] = add(progress, index);
+          cache[index] = add(progress, index);
         }
       }
 
-      return result[index];
+      return cache[index];
     },
-    [result, itemCount, loop, progress],
+    [cache, itemCount, loop, progress],
   );
 };

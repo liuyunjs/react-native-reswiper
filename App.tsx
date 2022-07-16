@@ -17,7 +17,7 @@ import {
   StyleSheet,
   Button,
 } from 'react-native';
-import { Swiper, Indicator } from './library/main';
+import { Swiper, IndexIndicator } from './library/main';
 
 const itemBuilder = (index: number) => {
   return (
@@ -41,16 +41,18 @@ const App = () => {
       <View style={{ flex: 1 }}>
         <Button title="change" onPress={() => setIndex(index + 1)} />
         <Swiper
+          lazy
+          // horizontal={false}
           width={Dimensions.get('window').width}
           height={Dimensions.get('window').height}
           index={index}
           autoplay={false}
           onChange={setIndex}
           itemBuilder={itemBuilder}
-          itemCount={8}>
+          itemCount={800}>
           <SafeAreaView style={StyleSheet.absoluteFill} pointerEvents="none">
             <View style={{ flex: 1 }}>
-              <Indicator activeColor="orange" gap={2} size={12} />
+              <IndexIndicator inset={-40} position="top" />
             </View>
           </SafeAreaView>
         </Swiper>

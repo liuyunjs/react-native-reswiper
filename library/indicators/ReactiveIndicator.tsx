@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Animated from 'react-native-reanimated';
-import { View, StyleProp, ViewStyle } from 'react-native';
+import { StyleProp, ViewStyle } from 'react-native';
 import { SwiperIndicatorContext } from '../SwiperIndicator';
 import {
   Interpolator,
@@ -8,11 +8,21 @@ import {
   interpolators,
   Dot,
 } from './Interpolator';
+import {
+  HorizontalLayout,
+  IndicatorContainer,
+  VerticalLayout,
+} from './IndicatorContainer';
 
-export interface IndicatorProps<T extends Interpolator> {
+export interface ReactiveIndicatorProps<T extends Interpolator> {
   position?: 'top' | 'start' | 'end' | 'bottom';
   itemStyleInterpolator?: T;
   style?: StyleProp<ViewStyle>;
+  inset?:
+    | number
+    | { top?: number; start?: number; end?: number; bottom?: number };
+  horizontalLayout?: HorizontalLayout;
+  verticalLayout?: VerticalLayout;
 }
 
 const IndicatorItem = <T extends Interpolator>({
@@ -46,15 +56,18 @@ const IndicatorItem = <T extends Interpolator>({
   );
 };
 
-export const Indicator = <T extends Interpolator = Interpolator<Dot>>({
+export const ReactiveIndicator = <T extends Interpolator = Interpolator<Dot>>({
   position,
   itemStyleInterpolator,
   style,
+  inset,
+  verticalLayout,
+  horizontalLayout,
   ...interpolatorConfig
-}: IndicatorProps<T> & InterpolatorConfig<T>) => {
+}: ReactiveIndicatorProps<T> & InterpolatorConfig<T>) => {
   const context = React.useContext(SwiperIndicatorContext);
   if (context == null)
-    throw new Error('Indicator 组件应该作为 Swiper 组件的子组件');
+    throw new Error('ReactiveIndicator 组件应该作为 Swiper 组件的子组件');
 
   const { getRelativeProgress, ...rest } = context;
 
@@ -72,39 +85,19 @@ export const Indicator = <T extends Interpolator = Interpolator<Dot>>({
     );
   }
 
-  const containerStyle: StyleProp<ViewStyle> = {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
-
-  if (rest.horizontal) {
-    containerStyle.start = 0;
-    containerStyle.end = 0;
-    if (position === 'top') {
-      containerStyle.top = 0;
-    } else {
-      containerStyle.bottom = 0;
-    }
-    containerStyle.flexDirection = 'row';
-  } else {
-    containerStyle.top = 0;
-    containerStyle.bottom = 0;
-    if (position === 'start') {
-      containerStyle.start = 0;
-    } else {
-      containerStyle.end = 0;
-    }
-    containerStyle.flexDirection = 'column';
-  }
-
   return (
-    <View pointerEvents="none" style={[style, containerStyle]}>
+    <IndicatorContainer
+      verticalLayout={verticalLayout}
+      horizontalLayout={horizontalLayout}
+      inset={inset}
+      style={style}
+      position={position}
+      horizontal={rest.horizontal}>
       {items}
-    </View>
+    </IndicatorContainer>
   );
 };
 
-Indicator.defaultProps = {
+ReactiveIndicator.defaultProps = {
   itemStyleInterpolator: interpolators.dot,
 };

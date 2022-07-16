@@ -7,6 +7,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { modulo } from '@liuyunjs/utils/lib/modulo';
 import type { Interpolator, InterpolatorConfig } from './Interpolator';
+import { useLazyBuilder } from './useLazyBuilder';
 
 export type SwiperInternalProps<T extends Interpolator> = {
   itemCount: number;
@@ -28,6 +29,8 @@ export type SwiperInternalProps<T extends Interpolator> = {
   >;
   index?: number;
   maxRenderCount?: number;
+  lazy?: boolean;
+  lazyPlaceholder?: React.ReactNode;
 } & InterpolatorConfig<T>;
 
 const SwiperItem = <T extends Interpolator>({
@@ -83,7 +86,8 @@ export const SwiperInternal = <T extends Interpolator>({
   trackOffset,
   slideSize,
   panProps,
-
+  lazy,
+  lazyPlaceholder,
   index,
   maxRenderCount,
   ...interpolatorConfig
@@ -93,6 +97,13 @@ export const SwiperInternal = <T extends Interpolator>({
   slideSize = percentNum(size, slideSize);
 
   const max = Math.min(itemCount, maxRenderCount!);
+  const builder = useLazyBuilder({
+    itemBuilder,
+    lazy,
+    lazyPlaceholder,
+    index: index!,
+    itemCount,
+  });
 
   for (let i = 0, len = max; i < len; i++) {
     const swipeIndex = modulo(index! + i - Math.floor(max / 2), itemCount);
@@ -107,7 +118,7 @@ export const SwiperInternal = <T extends Interpolator>({
         loop={loop}
         styleInterpolator={itemStyleInterpolator}
         key={swipeIndex}>
-        {itemBuilder(swipeIndex)}
+        {builder(swipeIndex)}
       </SwiperItem>,
     );
   }
