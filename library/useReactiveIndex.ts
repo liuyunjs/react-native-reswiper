@@ -18,7 +18,7 @@ export const useReactiveIndex = ({
   timingTo: (to: number) => number;
 }) => {
   const resetIndex = (nextIndex: number, force?: boolean) => {
-    nextIndex = clamp(0, nextIndex, itemCount - 1);
+    nextIndex = clamp(nextIndex, 0, itemCount - 1);
 
     const newIndex = loop
       ? -(
