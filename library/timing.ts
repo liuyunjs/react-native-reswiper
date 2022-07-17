@@ -1,11 +1,10 @@
 // @ts-nocheck
 
 import {
-  Easing,
   EasingFn,
   EasingFactoryFn,
 } from 'react-native-reanimated/src/reanimated2/Easing';
-import { defineAnimation } from 'react-native-reanimated';
+import { defineAnimation, Easing } from 'react-native-reanimated';
 import {
   Animation,
   AnimationCallback,

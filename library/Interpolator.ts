@@ -1,4 +1,4 @@
-import { Extrapolate, interpolate, SharedValue } from 'react-native-reanimated';
+import { Extrapolate, interpolate } from 'react-native-reanimated';
 import { ViewStyle } from 'react-native';
 
 export interface Interpolator<T extends any = any> {
