@@ -97,11 +97,11 @@ _【必传】_ 轮播图的数量
 
 _【必传】_ 一个函数，根据 index 返回每个轮播图
 
-#### index?: number
+#### activeIndex?: number
 
-处于活动状态的轮播图的下标，设置一个新的 index 会切换轮播图，默认为 0
+处于活动状态的轮播图的下标，设置一个新的 activeIndex 会切换轮播图，默认为 0
 
-#### onChange?: (index: number) => void;
+#### onChange?: (nextIndex: number) => void;
 
 切换轮播图时调用的回调
 
