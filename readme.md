@@ -1,6 +1,6 @@
 # react-native-reswiper
 
-基于 react-native-reanimated v1声明式api(兼容v2) react-native-gesture-handler 实现的一套轮播图组件，可自定义动画
+基于 react-native-reanimated v2 react-native-gesture-handler 实现的一套轮播图组件，可自定义动画
 
 ## 安装
 
