@@ -1,36 +1,81 @@
-import { useWillMount } from '@liuyunjs/hooks/lib/useWillMount';
-import { block, event, set, Value } from 'react-native-reanimated';
-import { useCodeExec } from '@liuyunjs/hooks/lib/react-native-reanimated/useCodeExec';
-import type { Context } from './Swiper';
+import * as React from 'react';
+import {
+  cancelAnimation,
+  runOnJS,
+  SharedValue,
+  useAnimatedGestureHandler,
+} from 'react-native-reanimated';
+import { PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
+import { clamp, getDirection } from './utils';
 
-export const useGestureEvent = (ctx: Context, horizontal?: boolean) => {
-  const values = useWillMount(() => {
-    return {
-      gx: new Value<number>(0),
-      gy: new Value<number>(0),
-      vx: new Value<number>(0),
-      vy: new Value<number>(0),
-    };
-  });
-
-  useCodeExec(() => {
-    return block([
-      set(ctx.gesture, horizontal ? values.gx : values.gy),
-      set(ctx.velocity, horizontal ? values.vx : values.vy),
-    ]);
-  }, [horizontal]);
-
-  return useWillMount(() =>
-    event([
-      {
-        nativeEvent: {
-          translationX: values.gx,
-          state: ctx.gestureState,
-          velocityX: values.vx,
-          velocityY: values.vy,
-          translationY: values.gy,
-        },
-      },
-    ]),
+export const useGestureEvent = ({
+  horizontal,
+  itemCount,
+  activeIndex,
+  timingTo,
+  progress,
+  loop,
+  toggleEnabled,
+  size,
+}: {
+  horizontal: boolean;
+  itemCount: number;
+  loop: boolean;
+  progress: SharedValue<number>;
+  activeIndex: number;
+  toggleEnabled: (nextEnabled: boolean) => void;
+  timingTo: (to: number) => number;
+  size: number;
+}) => {
+  const maybeClampProgress = React.useCallback(
+    (next: number) => {
+      'worklet';
+      return loop ? next : clamp(next, 1 - itemCount, 0);
+    },
+    [loop, itemCount],
   );
+
+  return useAnimatedGestureHandler<
+    PanGestureHandlerGestureEvent,
+    {
+      offset: number;
+      enabled: boolean;
+    }
+  >({
+    onStart(evt, _) {
+      cancelAnimation(progress);
+      _.offset = progress.value;
+      _.enabled = true;
+    },
+    onActive({ translationY, translationX }, _) {
+      cancelAnimation(progress);
+      const gesture = horizontal ? translationX : translationY;
+      if (!loop) {
+        if (
+          _.enabled &&
+          ((activeIndex === 1 - itemCount && gesture < 0) ||
+            (activeIndex === 0 && gesture > 0))
+        ) {
+          runOnJS(toggleEnabled)((_.enabled = false));
+        }
+      }
+      progress.value = maybeClampProgress(
+        _.offset + (gesture / size) * getDirection(horizontal),
+      );
+    },
+    onEnd({ translationX, translationY, velocityY, velocityX }, _) {
+      const velocity = horizontal ? velocityX : velocityY;
+      const gesture = horizontal ? translationX : translationY;
+      const extrapolatedPosition = gesture + velocity * 0.3;
+      const toIndex =
+        Math.abs(gesture) > 20 && Math.abs(extrapolatedPosition) > size * 0.5
+          ? maybeClampProgress(
+              activeIndex +
+                Math.sign(extrapolatedPosition) * getDirection(horizontal),
+            )
+          : activeIndex;
+
+      progress.value = timingTo(toIndex);
+    },
+  });
 };

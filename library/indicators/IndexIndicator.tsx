@@ -12,6 +12,7 @@ import {
   IndicatorContainer,
   VerticalLayout,
 } from './IndicatorContainer';
+import { modulo } from '../utils';
 
 export type IndexIndicatorProps = {
   style?: StyleProp<ViewStyle>;
@@ -36,7 +37,7 @@ export const IndexIndicator: React.FC<IndexIndicatorProps> = ({
   if (context == null)
     throw new Error('IndexIndicator 组件应该作为 Swiper 组件的子组件');
 
-  const { horizontal, index, itemCount } = context;
+  const { horizontal, activeIndex, itemCount } = context;
 
   return (
     <IndicatorContainer
@@ -47,7 +48,7 @@ export const IndexIndicator: React.FC<IndexIndicatorProps> = ({
       horizontalLayout={horizontalLayout}
       style={style}>
       <Text style={[styles.indicator, indicatorStyle]}>
-        {index + 1} / {itemCount}
+        {activeIndex + 1} / {itemCount}
       </Text>
     </IndicatorContainer>
   );

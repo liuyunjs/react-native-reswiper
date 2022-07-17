@@ -1,17 +1,15 @@
-import Animated, { Extrapolate, multiply } from 'react-native-reanimated';
+import { Extrapolate, interpolate, SharedValue } from 'react-native-reanimated';
 import { ViewStyle } from 'react-native';
-import { interpolate } from './utils';
 
 export interface Interpolator<T extends any = any> {
   (props: {
     horizontal: boolean;
     containerSize: number;
-    progress: Animated.Adaptable<number>;
+    progress: number;
     config: T;
     itemCount: number;
     loop: boolean;
-  }): Animated.AnimateStyle<ViewStyle>;
-  defaultConfig: Partial<T>;
+  }): ViewStyle;
 }
 
 export type InterpolatorConfig<T extends Interpolator> = T extends Interpolator<
@@ -20,47 +18,43 @@ export type InterpolatorConfig<T extends Interpolator> = T extends Interpolator<
   ? Partial<C>
   : never;
 
-const slide: Interpolator<{}> = ({ horizontal, progress, containerSize }) => ({
-  transform: [
-    horizontal
-      ? {
-          translateX: multiply(progress, containerSize),
-        }
-      : {
-          translateY: multiply(progress, containerSize),
-        },
-  ],
-});
-
-slide.defaultConfig = {};
+const slide: Interpolator<{}> = ({ horizontal, progress, containerSize }) => {
+  'worklet';
+  return {
+    transform: [
+      horizontal
+        ? {
+            translateX: progress * containerSize,
+          }
+        : {
+            translateY: progress * containerSize,
+          },
+    ],
+  };
+};
 
 const slideScale: Interpolator<{
   activeScale: number;
   inactiveScale: number;
 }> = (props) => {
+  'worklet';
   const slideInterpolator = slide(props as any);
-  let { progress, config } = props;
 
-  config = { ...slideScale.defaultConfig, ...config };
+  const config = Object.assign(
+    { activeScale: 1, inactiveScale: 0.85 },
+    props.config,
+  );
 
   slideInterpolator.transform![1] = {
-    scale: interpolate(progress, {
-      inputRange: [-1, 0, 1],
-      outputRange: [
-        config.inactiveScale,
-        config.activeScale,
-        config.inactiveScale,
-      ],
-      extrapolate: Extrapolate.CLAMP,
-    }),
+    scale: interpolate(
+      props.progress,
+      [-1, 0, 1],
+      [config.inactiveScale, config.activeScale, config.inactiveScale],
+      Extrapolate.CLAMP,
+    ),
   };
 
   return slideInterpolator;
-};
-
-slideScale.defaultConfig = {
-  activeScale: 1,
-  inactiveScale: 0.85,
 };
 
 export const interpolators = {

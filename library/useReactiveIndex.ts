@@ -1,34 +1,46 @@
+import { clamp } from './utils';
 import * as React from 'react';
-import { clamp } from '@liuyunjs/utils/lib/clamp';
-import type { SwiperProps, Context } from './Swiper';
-import type { Interpolator } from './Interpolator';
+import { SharedValue } from 'react-native-reanimated';
 
-export const useReactiveIndex = <T extends Interpolator = Interpolator>(
-  { index, itemCount, loop }: SwiperProps<T>,
-  ctx: Context,
-) => {
-  const resetIndex = (force?: boolean) => {
-    if (index != null) {
-      index = clamp(0, index, itemCount - 1);
+export const useReactiveIndex = ({
+  itemCount,
+  activeIndex,
+  activeIndexRef,
+  loop,
+  progress,
+  timingTo,
+}: {
+  itemCount: number;
+  loop: boolean;
+  activeIndexRef: React.MutableRefObject<number>;
+  progress: SharedValue<number>;
+  activeIndex: number;
+  timingTo: (to: number) => number;
+}) => {
+  const resetIndex = (nextIndex: number, force?: boolean) => {
+    nextIndex = clamp(0, nextIndex, itemCount - 1);
 
-      const nextIndex = loop
-        ? -(Math.floor(-ctx.indexJs / itemCount) * itemCount + index)
-        : -index;
+    const newIndex = loop
+      ? -(
+          Math.floor(-activeIndexRef.current / itemCount) * itemCount +
+          nextIndex
+        )
+      : -nextIndex;
 
-      if (nextIndex !== ctx.indexJs) {
-        if (force) {
-          ctx.progress.setValue(nextIndex);
-        }
-        ctx.index.setValue(nextIndex);
+    if (newIndex !== activeIndexRef.current) {
+      if (force) {
+        progress.value = activeIndexRef.current = newIndex;
+      } else {
+        progress.value = timingTo((activeIndexRef.current = newIndex));
       }
     }
   };
 
-  React.useLayoutEffect(() => {
-    resetIndex(true);
+  React.useMemo(() => {
+    resetIndex(activeIndex, true);
   }, [itemCount]);
 
-  React.useLayoutEffect(() => {
-    resetIndex(false);
-  }, [index]);
+  React.useMemo(() => {
+    resetIndex(activeIndex);
+  }, [activeIndex]);
 };

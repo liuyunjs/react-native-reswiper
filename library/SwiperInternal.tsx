@@ -4,19 +4,21 @@ import {
   PanGestureHandler,
   PanGestureHandlerProps,
 } from 'react-native-gesture-handler';
-import Animated from 'react-native-reanimated';
-import { modulo } from '@liuyunjs/utils/lib/modulo';
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import type { Interpolator, InterpolatorConfig } from './Interpolator';
 import { useLazyBuilder } from './useLazyBuilder';
+import { modulo, getRelativeProgress } from './utils';
 
 export type SwiperInternalProps<T extends Interpolator> = {
   itemCount: number;
   itemBuilder: (i: number) => React.ReactNode;
   size: number;
   horizontal: boolean;
-  getRelativeProgress: (index: number) => Animated.Node<number>;
   onGestureEvent: () => void;
-  enabled?: boolean;
+  enabled: boolean;
   itemStyleInterpolator: T;
   loop: boolean;
   slideSize: number;
@@ -27,10 +29,11 @@ export type SwiperInternalProps<T extends Interpolator> = {
     PanGestureHandlerProps,
     'enabled' | 'onGestureEvent' | 'onHandlerStateChange'
   >;
-  index?: number;
-  maxRenderCount?: number;
-  lazy?: boolean;
-  lazyPlaceholder?: React.ReactNode;
+  activeIndex: number;
+  maxRenderCount: number;
+  lazy: boolean;
+  lazyPlaceholder: React.ReactNode;
+  progress: SharedValue<number>;
 } & InterpolatorConfig<T>;
 
 const SwiperItem = <T extends Interpolator>({
@@ -40,6 +43,7 @@ const SwiperItem = <T extends Interpolator>({
   itemCount,
   size,
   styleInterpolator,
+  index,
   progress,
   ...config
 }: {
@@ -49,21 +53,28 @@ const SwiperItem = <T extends Interpolator>({
   itemCount: number;
   size: number;
   styleInterpolator: T;
-  progress: Animated.Node<number>;
+  index: number;
+  progress: SharedValue<number>;
 } & InterpolatorConfig<T>) => {
+  const style = useAnimatedStyle(() => {
+    return styleInterpolator({
+      horizontal,
+      progress: getRelativeProgress({
+        loop,
+        progress: progress.value,
+        horizontal,
+        itemCount,
+        index,
+      }),
+      containerSize: size,
+      config,
+      itemCount,
+      loop,
+    });
+  });
+
   return (
-    <Animated.View
-      style={[
-        StyleSheet.absoluteFill,
-        styleInterpolator({
-          horizontal,
-          progress,
-          containerSize: size,
-          config,
-          itemCount,
-          loop,
-        }),
-      ]}>
+    <Animated.View style={[StyleSheet.absoluteFill, style]}>
       {children}
     </Animated.View>
   );
@@ -76,7 +87,6 @@ const percentNum = (size: number, num: number) => {
 export const SwiperInternal = <T extends Interpolator>({
   size,
   horizontal,
-  getRelativeProgress,
   itemBuilder,
   itemCount,
   onGestureEvent,
@@ -88,8 +98,9 @@ export const SwiperInternal = <T extends Interpolator>({
   panProps,
   lazy,
   lazyPlaceholder,
-  index,
+  activeIndex,
   maxRenderCount,
+  progress,
   ...interpolatorConfig
 }: SwiperInternalProps<T>) => {
   const nodes: React.ReactNode[] = [];
@@ -101,25 +112,24 @@ export const SwiperInternal = <T extends Interpolator>({
     itemBuilder,
     lazy,
     lazyPlaceholder,
-    index: index!,
+    activeIndex,
     itemCount,
   });
 
   const getSwipeIndex = (i: number) => {
     if (itemCount < maxRenderCount!) return i;
-    const relativeIndex = index! + i - Math.floor(maxRenderCount! / 2);
+    const relativeIndex = activeIndex + i - Math.floor(maxRenderCount! / 2);
     if (loop) return modulo(relativeIndex, itemCount);
     // 要渲染的第一个view已经到了最左边了
-    if (index! < maxRenderCount! / 2) return i;
+    if (activeIndex < maxRenderCount! / 2) return i;
     // 要渲染的第一个view已经到了最右边了
-    if (index! > itemCount - maxRenderCount! / 2)
+    if (activeIndex > itemCount - maxRenderCount! / 2)
       return itemCount - maxRenderCount! + i;
     return relativeIndex;
   };
 
   for (let i = 0, len = max; i < len; i++) {
     const swipeIndex = getSwipeIndex(i);
-    const progress = getRelativeProgress(swipeIndex);
     nodes.push(
       <SwiperItem
         {...(interpolatorConfig as any)}
@@ -128,6 +138,7 @@ export const SwiperInternal = <T extends Interpolator>({
         size={slideSize}
         itemCount={itemCount}
         loop={loop}
+        index={swipeIndex}
         styleInterpolator={itemStyleInterpolator}
         key={swipeIndex}>
         {builder(swipeIndex)}
@@ -139,7 +150,6 @@ export const SwiperInternal = <T extends Interpolator>({
     <PanGestureHandler
       {...panProps}
       enabled={enabled}
-      onHandlerStateChange={onGestureEvent}
       onGestureEvent={onGestureEvent}>
       <Animated.View style={styles.container}>
         <View

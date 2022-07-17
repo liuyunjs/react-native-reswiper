@@ -1,37 +1,23 @@
 import * as React from 'react';
-import Animated from 'react-native-reanimated';
+import { SharedValue } from 'react-native-reanimated';
 
 export interface ISwiperIndicatorContext {
   horizontal: boolean;
-  getRelativeProgress: (index: number) => Animated.Node<number>;
   itemCount: number;
   loop: boolean;
   containerSize: number;
-  index: number;
+  activeIndex: number;
+  progress: SharedValue<number>;
 }
 
 export const SwiperIndicatorContext =
   React.createContext<ISwiperIndicatorContext | null>(null);
 
-export const SwiperIndicator: React.FC<ISwiperIndicatorContext> = ({
-  children,
-  horizontal,
-  getRelativeProgress,
-  itemCount,
-  containerSize,
-  loop,
-  index,
-}) => {
+export const SwiperIndicator: React.FC<
+  React.PropsWithChildren<ISwiperIndicatorContext>
+> = ({ children, ...rest }) => {
   return (
-    <SwiperIndicatorContext.Provider
-      value={{
-        getRelativeProgress,
-        horizontal,
-        itemCount,
-        containerSize,
-        loop,
-        index,
-      }}>
+    <SwiperIndicatorContext.Provider value={rest}>
       {children}
     </SwiperIndicatorContext.Provider>
   );

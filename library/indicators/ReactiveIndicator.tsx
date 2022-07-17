@@ -1,5 +1,8 @@
 import * as React from 'react';
-import Animated from 'react-native-reanimated';
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { StyleProp, ViewStyle } from 'react-native';
 import { SwiperIndicatorContext } from '../SwiperIndicator';
 import {
@@ -13,6 +16,7 @@ import {
   IndicatorContainer,
   VerticalLayout,
 } from './IndicatorContainer';
+import { getRelativeProgress } from '../utils';
 
 export interface ReactiveIndicatorProps<T extends Interpolator> {
   position?: 'top' | 'start' | 'end' | 'bottom';
@@ -25,13 +29,14 @@ export interface ReactiveIndicatorProps<T extends Interpolator> {
   verticalLayout?: VerticalLayout;
 }
 
-const IndicatorItem = <T extends Interpolator>({
+const ReactiveIndicatorItem = <T extends Interpolator>({
   progress,
   styleInterpolator,
   loop,
   horizontal,
   itemCount,
   containerSize,
+  index,
   ...config
 }: {
   horizontal: boolean;
@@ -39,21 +44,27 @@ const IndicatorItem = <T extends Interpolator>({
   itemCount: number;
   size: number;
   styleInterpolator: T;
-  progress: Animated.Node<number>;
+  progress: SharedValue<number>;
+  index: number;
 } & InterpolatorConfig<T>) => {
-  return (
-    <Animated.View
-      // @ts-ignore
-      style={styleInterpolator({
-        horizontal,
-        progress,
-        containerSize,
-        config,
-        itemCount,
+  const style = useAnimatedStyle(() => {
+    return styleInterpolator({
+      horizontal,
+      progress: getRelativeProgress({
         loop,
-      })}
-    />
-  );
+        progress: progress.value,
+        horizontal,
+        itemCount,
+        index,
+      }),
+      containerSize,
+      config,
+      itemCount,
+      loop,
+    });
+  });
+
+  return <Animated.View style={style} />;
 };
 
 export const ReactiveIndicator = <T extends Interpolator = Interpolator<Dot>>({
@@ -69,17 +80,15 @@ export const ReactiveIndicator = <T extends Interpolator = Interpolator<Dot>>({
   if (context == null)
     throw new Error('ReactiveIndicator 组件应该作为 Swiper 组件的子组件');
 
-  const { getRelativeProgress, ...rest } = context;
-
   const items: React.ReactNode[] = [];
 
-  for (let i = 0; i < rest.itemCount; i++) {
+  for (let i = 0; i < context.itemCount; i++) {
     items.push(
-      <IndicatorItem
-        {...rest}
+      <ReactiveIndicatorItem
+        {...context}
         {...(interpolatorConfig as any)}
+        index={i}
         styleInterpolator={itemStyleInterpolator!}
-        progress={getRelativeProgress(i)}
         key={i}
       />,
     );
@@ -92,7 +101,7 @@ export const ReactiveIndicator = <T extends Interpolator = Interpolator<Dot>>({
       inset={inset}
       style={style}
       position={position}
-      horizontal={rest.horizontal}>
+      horizontal={context.horizontal}>
       {items}
     </IndicatorContainer>
   );

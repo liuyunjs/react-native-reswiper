@@ -4,13 +4,13 @@ export const useLazyBuilder = ({
   itemBuilder,
   lazy,
   lazyPlaceholder,
-  index,
+  activeIndex,
   itemCount,
 }: {
   itemBuilder: (index: number) => React.ReactNode;
   lazy?: boolean;
   lazyPlaceholder?: React.ReactNode;
-  index: number;
+  activeIndex: number;
   itemCount: number;
 }) => {
   const mounted = React.useRef<number[]>([]).current;
@@ -20,7 +20,7 @@ export const useLazyBuilder = ({
   mounted.length = itemCount;
 
   return (idx: number) => {
-    if (index === idx) mounted[idx] = 1;
+    if (activeIndex === idx) mounted[idx] = 1;
     if (mounted[idx]) return itemBuilder(idx);
     return lazyPlaceholder || null;
   };

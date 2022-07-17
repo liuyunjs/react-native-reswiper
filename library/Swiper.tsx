@@ -6,21 +6,8 @@ import {
   ViewStyle,
   ActivityIndicator,
 } from 'react-native';
-import Animated, {
-  Easing,
-  // @ts-ignore
-  EasingNode,
-} from 'react-native-reanimated';
-import { clamp } from '@liuyunjs/utils/lib/clamp';
+import { Easing, useSharedValue } from 'react-native-reanimated';
 import { PanGestureHandlerProps } from 'react-native-gesture-handler';
-import { useReactionState } from '@liuyunjs/hooks/lib/useReactionState';
-import { useInitializer } from './useInitializer';
-import { useGestureEvent } from './useGestureEvent';
-import { useAnimate } from './useAnimate';
-import { useReactiveIndex } from './useReactiveIndex';
-import { useProgress } from './useProgress';
-import { useRelativeProgress } from './useRelativeProgress';
-import { useEnabledToggle } from './useEnabledToggle';
 import { SwiperInternal } from './SwiperInternal';
 import { SwiperIndicator } from './SwiperIndicator';
 import {
@@ -28,15 +15,24 @@ import {
   interpolators,
   InterpolatorConfig,
 } from './Interpolator';
+import { modulo } from './utils';
+import { useEnabledToggle } from './useEnabledToggle';
+import { useAutoPlay } from './useAutoPlay';
+import { useReactiveIndex } from './useReactiveIndex';
+import { useActionIndexRef } from './useActionIndexRef';
+import { useGestureEvent } from './useGestureEvent';
+import { useTimingTo } from './useTimingTo';
 
 interface HorizontalProps {
   horizontal?: true;
   width: number;
+  height?: number;
 }
 
 interface VerticalProps {
   horizontal: false;
   height: number;
+  width?: number;
 }
 
 export type SwiperProps<T extends Interpolator> = (
@@ -45,13 +41,13 @@ export type SwiperProps<T extends Interpolator> = (
 ) & {
   itemCount: number;
   itemBuilder: (i: number) => React.ReactNode;
-  index?: number;
+  activeIndex?: number;
   loop?: boolean;
   autoplay?: boolean;
   autoplayInterval?: number;
   onChange?: (index: number) => void;
   duration?: number;
-  easing?: (v: Animated.Adaptable<number>) => Animated.Node<number>;
+  easing?: (v: number) => number;
   enabled?: boolean;
   itemStyleInterpolator?: T;
   children?: React.ReactNode;
@@ -65,66 +61,96 @@ export type SwiperProps<T extends Interpolator> = (
   maxRenderCount?: number;
   lazy?: boolean;
   lazyPlaceholder?: React.ReactNode;
-};
+} & InterpolatorConfig<T>;
 
-export type Context = ReturnType<typeof useInitializer>;
+export const Swiper = <T extends Interpolator>({
+  children,
+  enabled,
+  style,
+  activeIndex: activeIndexProp,
+  onChange,
+  autoplay,
+  duration,
+  easing,
+  autoplayInterval,
+  width,
+  height,
 
-export type Animate = ReturnType<typeof useAnimate>;
+  ...rest
+}: SwiperProps<T>) => {
+  const { horizontal, itemCount, loop } = rest;
 
-const E = EasingNode || Easing;
+  const size = horizontal ? width! : height!;
 
-export const Swiper = <T extends Interpolator>(
-  props: SwiperProps<T> & InterpolatorConfig<T>,
-) => {
-  const { children, enabled, style, ...rest } = props;
-  const { horizontal, itemCount } = rest;
-  const [index, setIndex] = useReactionState<number>(
-    clamp(0, rest.index!, itemCount - 1),
-  );
+  const progress = useSharedValue(activeIndexProp!);
+  const [gestureEnabled, toggleEnabled] = useEnabledToggle({ enabled });
 
-  const size = horizontal
-    ? (props as HorizontalProps).width
-    : (props as VerticalProps).height;
+  const [activeIndexRef, setActiveIndex] = useActionIndexRef({
+    activeIndex: activeIndexProp!,
+    onChange: onChange!,
+    itemCount,
+  });
 
-  const [gestureEnabled, toggleEnabled] = useEnabledToggle(props);
+  const { timingTo, status } = useTimingTo({
+    duration: duration!,
+    easing: easing!,
+    setActiveIndex,
+  });
 
-  const ctx = useInitializer<T>(props);
+  useReactiveIndex({
+    activeIndexRef,
+    activeIndex: activeIndexProp!,
+    loop,
+    itemCount,
+    timingTo,
+    progress,
+  });
 
-  const onGestureEvent = useGestureEvent(ctx, horizontal);
+  // 这行代码位置不能随便改
+  const activeIndex = activeIndexRef.current;
 
-  useReactiveIndex(props, ctx);
+  useAutoPlay({
+    activeIndex,
+    autoplay: autoplay!,
+    animationStatus: status,
+    autoplayInterval: autoplayInterval!,
+    progress,
+    loop,
+    itemCount,
+    timingTo,
+  });
 
-  const animate = useAnimate(props, ctx);
-
-  const progress = useProgress(
-    props,
-    ctx,
-    animate,
-    size,
+  const onGestureEvent = useGestureEvent({
+    horizontal,
+    loop,
     toggleEnabled,
-    setIndex,
-  );
+    timingTo,
+    itemCount,
+    size,
+    progress,
+    activeIndex,
+  });
 
-  const getRelativeProgress = useRelativeProgress(props, progress);
+  const realActiveIndex = modulo(-activeIndex, itemCount);
 
   return (
     <View style={[styles.container, style]}>
       <SwiperInternal
         {...(rest as any)}
-        index={index}
+        progress={progress}
+        activeIndex={realActiveIndex}
         enabled={gestureEnabled && enabled && !!size}
-        getRelativeProgress={getRelativeProgress}
         size={size}
         onGestureEvent={onGestureEvent}
       />
       {!!children && (
         <SwiperIndicator
-          index={index}
+          progress={progress}
+          activeIndex={realActiveIndex}
           containerSize={size}
-          loop={props.loop!}
+          loop={loop!}
           itemCount={itemCount}
-          horizontal={horizontal!}
-          getRelativeProgress={getRelativeProgress}>
+          horizontal={horizontal!}>
           {children}
         </SwiperIndicator>
       )}
@@ -134,7 +160,8 @@ export const Swiper = <T extends Interpolator>(
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    width: '100%',
+    height: '100%',
   },
   placeholder: {
     flex: 1,
@@ -144,11 +171,11 @@ const styles = StyleSheet.create({
 });
 
 Swiper.defaultProps = {
-  index: 0,
+  activeIndex: 0,
   horizontal: true,
   loop: true,
   duration: 300,
-  easing: E.out(E.cubic),
+  easing: Easing.out(Easing.cubic),
   autoplayInterval: 3000,
   autoplay: true,
   enabled: true,
@@ -156,6 +183,7 @@ Swiper.defaultProps = {
   slideSize: 1,
   trackOffset: 0,
   maxRenderCount: 5,
+  onChange: () => {},
   lazyPlaceholder: (
     <View style={styles.placeholder}>
       <ActivityIndicator size="large" />
