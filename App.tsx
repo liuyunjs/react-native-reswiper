@@ -41,7 +41,7 @@ const App = () => {
       width={300}
       // width={Dimensions.get('window').width}
       // height={Dimensions.get('window').height}
-      index={index}
+      activeIndex={index}
       // loop={false}
       // autoplay={false}
       onChange={setIndex}
