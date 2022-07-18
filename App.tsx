@@ -10,7 +10,12 @@
 
 import React from 'react';
 import { View, Text, Dimensions } from 'react-native';
-import { Swiper, IndexIndicator } from './library/main';
+import {
+  Swiper,
+  IndexIndicator,
+  DefaultIndicator,
+  ReactiveIndicator,
+} from './library/main';
 
 const itemBuilder = (index: number) => {
   return (
@@ -31,19 +36,21 @@ const App = () => {
 
   return (
     <Swiper
-      lazy
-      horizontal={false}
-      width={Dimensions.get('window').width}
-      height={Dimensions.get('window').height}
+      // lazy
+      // horizontal={false}
+      width={300}
+      // width={Dimensions.get('window').width}
+      // height={Dimensions.get('window').height}
       index={index}
-      loop={false}
+      // loop={false}
       // autoplay={false}
       onChange={setIndex}
       itemBuilder={itemBuilder}
       maxRenderCount={4}
-      itemCount={6}>
-      <IndexIndicator
-        verticalLayout="top"
+      itemCount={3}>
+      <DefaultIndicator
+        type="dot"
+        // verticalLayout="middle"
         inset={{ bottom: 44, top: 64, end: 20, start: 20 }}
         position="start"
       />

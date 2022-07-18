@@ -28,14 +28,17 @@ import {
   interpolators,
   InterpolatorConfig,
 } from './Interpolator';
+import { getSize } from './utils';
 
 interface HorizontalProps {
   horizontal?: true;
   width: number;
+  height?: number;
 }
 
 interface VerticalProps {
   horizontal: false;
+  width?: number;
   height: number;
 }
 
@@ -45,7 +48,7 @@ export type SwiperProps<T extends Interpolator> = (
 ) & {
   itemCount: number;
   itemBuilder: (i: number) => React.ReactNode;
-  index?: number;
+  activeIndex?: number;
   loop?: boolean;
   autoplay?: boolean;
   autoplayInterval?: number;
@@ -65,7 +68,7 @@ export type SwiperProps<T extends Interpolator> = (
   maxRenderCount?: number;
   lazy?: boolean;
   lazyPlaceholder?: React.ReactNode;
-};
+} & InterpolatorConfig<T>;
 
 export type Context = ReturnType<typeof useInitializer>;
 
@@ -73,18 +76,22 @@ export type Animate = ReturnType<typeof useAnimate>;
 
 const E = EasingNode || Easing;
 
-export const Swiper = <T extends Interpolator>(
-  props: SwiperProps<T> & InterpolatorConfig<T>,
-) => {
+export const Swiper = <T extends Interpolator>(props: SwiperProps<T>) => {
   const { children, enabled, style, ...rest } = props;
   const { horizontal, itemCount } = rest;
-  const [index, setIndex] = useReactionState<number>(
-    clamp(0, rest.index!, itemCount - 1),
-  );
 
-  const size = horizontal
-    ? (props as HorizontalProps).width
-    : (props as VerticalProps).height;
+  if (__DEV__) {
+    if (rest.activeIndex == null && typeof (rest as any).index === 'number') {
+      console.error(
+        '[react-native-reswiper]: please use "activeIndex" instead of "index"',
+      );
+    }
+  }
+
+  const [activeIndex, setActiveIndex] = useReactionState<number>(
+    clamp(0, rest.activeIndex! ?? (rest as any).index ?? 0, itemCount - 1),
+  );
+  const size = getSize(props);
 
   const [gestureEnabled, toggleEnabled] = useEnabledToggle(props);
 
@@ -102,7 +109,7 @@ export const Swiper = <T extends Interpolator>(
     animate,
     size,
     toggleEnabled,
-    setIndex,
+    setActiveIndex,
   );
 
   const getRelativeProgress = useRelativeProgress(props, progress);
@@ -111,15 +118,15 @@ export const Swiper = <T extends Interpolator>(
     <View style={[styles.container, style]}>
       <SwiperInternal
         {...(rest as any)}
-        index={index}
-        enabled={gestureEnabled && enabled && !!size}
+        activeIndex={activeIndex}
+        enabled={gestureEnabled && enabled && !!size && itemCount > 1}
         getRelativeProgress={getRelativeProgress}
         size={size}
         onGestureEvent={onGestureEvent}
       />
       {!!children && (
         <SwiperIndicator
-          index={index}
+          activeIndex={activeIndex}
           containerSize={size}
           loop={props.loop!}
           itemCount={itemCount}
@@ -144,7 +151,6 @@ const styles = StyleSheet.create({
 });
 
 Swiper.defaultProps = {
-  index: 0,
   horizontal: true,
   loop: true,
   duration: 300,

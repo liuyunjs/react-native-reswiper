@@ -8,7 +8,7 @@ export const useReactiveIndex = <T extends Interpolator = Interpolator>(
   ctx: Context,
 ) => {
   const resetIndex = (force?: boolean) => {
-    if (index != null) {
+    if (index != null && itemCount > 0) {
       index = clamp(0, index, itemCount - 1);
 
       const nextIndex = loop

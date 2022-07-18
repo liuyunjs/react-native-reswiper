@@ -7,7 +7,7 @@ export interface ISwiperIndicatorContext {
   itemCount: number;
   loop: boolean;
   containerSize: number;
-  index: number;
+  activeIndex: number;
 }
 
 export const SwiperIndicatorContext =
@@ -20,7 +20,7 @@ export const SwiperIndicator: React.FC<ISwiperIndicatorContext> = ({
   itemCount,
   containerSize,
   loop,
-  index,
+  activeIndex,
 }) => {
   return (
     <SwiperIndicatorContext.Provider
@@ -30,7 +30,7 @@ export const SwiperIndicator: React.FC<ISwiperIndicatorContext> = ({
         itemCount,
         containerSize,
         loop,
-        index,
+        activeIndex,
       }}>
       {children}
     </SwiperIndicatorContext.Provider>

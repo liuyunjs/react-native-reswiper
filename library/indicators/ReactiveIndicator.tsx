@@ -67,7 +67,9 @@ export const ReactiveIndicator = <T extends Interpolator = Interpolator<Dot>>({
 }: ReactiveIndicatorProps<T> & InterpolatorConfig<T>) => {
   const context = React.useContext(SwiperIndicatorContext);
   if (context == null)
-    throw new Error('ReactiveIndicator 组件应该作为 Swiper 组件的子组件');
+    throw new Error(
+      '[react-native-reswiper]: ReactiveIndicator 组件应该作为 Swiper 组件的子组件',
+    );
 
   const { getRelativeProgress, ...rest } = context;
 

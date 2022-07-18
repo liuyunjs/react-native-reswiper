@@ -53,7 +53,7 @@ export const useProgress = <T extends Interpolator = Interpolator>(
   );
 
   return React.useMemo(() => {
-    const minValue = 1 - itemCount;
+    const minValue = Math.min(0, 1 - itemCount);
     const maxValue = 0;
 
     const directionLeftOrRight = horizontal && I18nManager.isRTL ? -1 : 1;
@@ -147,7 +147,7 @@ export const useProgress = <T extends Interpolator = Interpolator>(
         set(ctx.autoplay.isAutoPlay, 0),
       ]),
 
-      autoplay && itemCount > 0
+      autoplay && itemCount > 1
         ? loop
           ? autoplayNode
           : cond(

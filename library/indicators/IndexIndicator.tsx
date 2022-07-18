@@ -34,9 +34,11 @@ export const IndexIndicator: React.FC<IndexIndicatorProps> = ({
 }) => {
   const context = React.useContext(SwiperIndicatorContext);
   if (context == null)
-    throw new Error('IndexIndicator 组件应该作为 Swiper 组件的子组件');
+    throw new Error(
+      '[react-native-reswiper]: IndexIndicator 组件应该作为 Swiper 组件的子组件',
+    );
 
-  const { horizontal, index, itemCount } = context;
+  const { horizontal, activeIndex, itemCount } = context;
 
   return (
     <IndicatorContainer
@@ -47,7 +49,7 @@ export const IndexIndicator: React.FC<IndexIndicatorProps> = ({
       horizontalLayout={horizontalLayout}
       style={style}>
       <Text style={[styles.indicator, indicatorStyle]}>
-        {index + 1} / {itemCount}
+        {Math.min(activeIndex + 1, itemCount)} / {itemCount}
       </Text>
     </IndicatorContainer>
   );

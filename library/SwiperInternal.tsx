@@ -27,7 +27,7 @@ export type SwiperInternalProps<T extends Interpolator> = {
     PanGestureHandlerProps,
     'enabled' | 'onGestureEvent' | 'onHandlerStateChange'
   >;
-  index?: number;
+  activeIndex?: number;
   maxRenderCount?: number;
   lazy?: boolean;
   lazyPlaceholder?: React.ReactNode;
@@ -88,7 +88,7 @@ export const SwiperInternal = <T extends Interpolator>({
   panProps,
   lazy,
   lazyPlaceholder,
-  index,
+  activeIndex,
   maxRenderCount,
   ...interpolatorConfig
 }: SwiperInternalProps<T>) => {
@@ -101,18 +101,18 @@ export const SwiperInternal = <T extends Interpolator>({
     itemBuilder,
     lazy,
     lazyPlaceholder,
-    index: index!,
+    activeIndex: activeIndex!,
     itemCount,
   });
 
   const getSwipeIndex = (i: number) => {
     if (itemCount < maxRenderCount!) return i;
-    const relativeIndex = index! + i - Math.floor(maxRenderCount! / 2);
+    const relativeIndex = activeIndex! + i - Math.floor(maxRenderCount! / 2);
     if (loop) return modulo(relativeIndex, itemCount);
     // 要渲染的第一个view已经到了最左边了
-    if (index! < maxRenderCount! / 2) return i;
+    if (activeIndex! < maxRenderCount! / 2) return i;
     // 要渲染的第一个view已经到了最右边了
-    if (index! > itemCount - maxRenderCount! / 2)
+    if (activeIndex! > itemCount - maxRenderCount! / 2)
       return itemCount - maxRenderCount! + i;
     return relativeIndex;
   };

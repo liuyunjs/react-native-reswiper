@@ -14,7 +14,7 @@ export const useRelativeProgress = <T extends Interpolator = Interpolator>(
     [horizontal, itemCount, loop, progress],
   );
 
-  const viewCount = Math.floor((itemCount - 1) / 2);
+  const viewCount = Math.floor(Math.max(itemCount - 1, 0) / 2);
 
   return React.useCallback(
     (index: number) => {

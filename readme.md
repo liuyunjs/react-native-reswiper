@@ -97,9 +97,9 @@ _【必传】_ 轮播图的数量
 
 _【必传】_ 一个函数，根据 index 返回每个轮播图
 
-#### index?: number
+#### activeIndex?: number
 
-处于活动状态的轮播图的下标，设置一个新的 index 会切换轮播图，默认为 0
+处于活动状态的轮播图的下标，设置一个新的 activeIndex 会切换轮播图，默认为 0
 
 #### onChange?: (index: number) => void;
 
@@ -209,8 +209,60 @@ horizontal 为 true 时相当于设置 justifyContent，为 false 时相当于�
 #### horizontalLayout?: 'center' | 'start' | 'end';
 horizontal 为 true 时相当于设置 alignItems，为 false 时相当于设置 justifyContent
 
-#### verticalLayout?: 'middle' | 'top' | 'bottom'; 
+#### verticalLayout?: 'middle' | 'top' | 'bottom';
 horizontal 为 true 时相当于设置 justifyContent，为 false 时相当于设置 alignItems
 
 #### indicatorStyle?: StyleProp<TextStyle>
 指示器文字的样式
+
+### DefaultIndicator (v1.4.0)
+一个文字指示器，在轮播图很多时建议使用
+
+#### position?: 'top' | 'bottom' | 'start' | 'end';
+
+指示器的位置，横向时默认是 bottom,竖向时默认是 end
+
+#### style?: StyleProp<ViewStyle>;
+
+最外层 View 的样式
+
+
+#### inset?: number | { top?: number; start?: number; end?: number; bottom?: number };
+指示器相对于容器得偏移量
+
+#### horizontalLayout?: 'center' | 'start' | 'end';
+horizontal 为 true 时相当于设置 alignItems，为 false 时相当于设置 justifyContent
+
+#### verticalLayout?: 'middle' | 'top' | 'bottom';
+horizontal 为 true 时相当于设置 justifyContent，为 false 时相当于设置 alignItems
+
+> type 不传的时候
+
+#### inactiveStyle?: StyleProp<ViewStyle>
+未选中时的样式
+#### activeStyle?: StyleProp<ViewStyle>
+选中时的样式
+
+> type === 'dot'
+
+#### size?: number;
+圆点的大小
+#### gap?: number;
+圆点之间的距离
+#### activeColor?: string;
+选中时的颜色
+#### color?: string;
+未选中时的颜色
+
+> type === 'strip';
+
+#### activeSize?: number;
+圆点选中时的宽或者高(horizontal为true时是宽，反之是高)，选中时变成长条
+#### size?: number;
+圆点的大小
+#### gap?: number;
+圆点之间的距离
+#### color?: string;
+未选中时的颜色
+#### activeColor?: string;
+选中时的颜色
